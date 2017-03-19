@@ -1,0 +1,15 @@
+Keyboard.js
+
+Adding some old javascript code which I found relating to virtual keyboards.
+
+First is a keyboard in implemented in Canvas.
+
+Then is an attempt to build a swype alternative with dictionary.
+
+There was a bookmarklet.
+ 
+There was also a thought to also add chinese support for it. 
+ 
+And there was a 3d version.
+
+I found this out of my attic archival, and it needs some maintainance and modernization for it to be working nicely again.
