@@ -41,7 +41,7 @@
 
 			border-radius: 5px;
 
-			-webkit-transition-duration: 1s;
+			-webkit-transition-duration: 0.2s;
 			-webkit-transition-property: all;
 			-webkit-transition-timing-function: ease-in;
 
@@ -98,8 +98,6 @@ ease in - to go up quickly.
 
 big blue flights to x of target, random x flips;
 
-
-
 2 - 
 3 - fix view
 4 - handling keypress
@@ -134,13 +132,12 @@ possibly -
 - js inverted index
  -->
 		<div id="container"></div>
-		<script src="../build/three.min.js"></script>
+		<script src="https://threejs.org/build/three.min.js"></script>
 
-		<script src="js/controls/TrackballControls.js"></script>
+		<script src="https://threejs.org/examples/js/controls/TrackballControls.js"></script>
 
-		<script src="js/renderers/CSS3DRenderer.js"></script>
-		<script src="zutils/resize.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+		<script src="https://threejs.org/examples/js/renderers/CSS3DRenderer.js"></script>
+		<script src="https://threejs.org/examples/js/libs/stats.min.js"></script>
 
 
 		<script>
@@ -321,6 +318,21 @@ var stop = false;
 			init();
 			animate();
 
+			function resize() {
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+				function onWindowResize() {
+
+					camera.aspect = window.innerWidth / window.innerHeight;
+					camera.updateProjectionMatrix();
+
+					renderer.setSize( window.innerWidth, window.innerHeight );
+
+				}
+
+			}
+
 			function init() {
 
 				camera = new THREE.PerspectiveCamera( 53, window.innerWidth / window.innerHeight, 1, 1000 );
@@ -339,9 +351,9 @@ var stop = false;
 
 				object.position.set(0, 0, 00);
 				camera.lookAt(object.position);
-				object.position.set(0, -200, -100);
+				object.position.set(-330, -200, -100);
 
-				// scene.add( object );
+				scene.add( object );
 
 				scene.add(keyboard3d);
 
@@ -376,7 +388,7 @@ var stop = false;
 				document.body.appendChild( stats.domElement );
 
 				// window.addEventListener( 'keydown', keydown, false );
-				z.resize();
+				resize();
 
 				document.addEventListener('keypress', keypress, false);
 				document.addEventListener('keydown', keydown, false);
