@@ -41,15 +41,13 @@
 
 			border-radius: 5px;
 
-			-webkit-transition-duration: 0.2s;
+			-webkit-transition-duration: 0.4s;
 			-webkit-transition-property: all;
-			-webkit-transition-timing-function: ease-in;
-
-
+			-webkit-transition-timing-function: ease-out-in;
 		}
 
 		.pressed {
-			/*position: relative;*/
+			/*position: absolute;*/
 
 	/*		top: 1px;
 			left: 1px;*/
@@ -59,10 +57,20 @@
 			border-color: #2B9DEB;
 			color: #2B9DEB;
 
-			-webkit-transform: translateZ(200px) rotateX(-90deg) rotateZ(1024deg) rotateX(1028deg);
-			/*-webkit-filter: blur(2px);*/
-			cursor: pointer;
+			transform:
+				rotateY(720deg)
+				translateY(-200px)
+				;
+			/*
+				translateZ(-200px)
+				rotateX(90deg)
+				rotateY(360deg)
+				rotateZ(360deg)
+				*/
+			/*filter: blur(1px);*/
 
+			
+			cursor: pointer;
 		}
 
 
@@ -141,8 +149,7 @@ possibly -
 
 
 		<script>
-
-var stop = false;
+			var stop = false;
 			// Keyboard Layout.
 
 			var keyboardCodes = [
@@ -181,7 +188,6 @@ var stop = false;
 			function lookupCharacter(a) {
 				if (a in idToCharacters) return idToCharacters[a];
 				return a;
-
 			}
 
 
@@ -247,15 +253,20 @@ var stop = false;
 						})(key.char), false);
 					}
 
-					key3d = new THREE.CSS3DObject(li);
+					// key3d = new THREE.CSS3DObject(li);
+					d = document.createElement('div');
+					d.appendChild(li);
+					key3d = new THREE.CSS3DObject(d);
+
+
 					key3d.position.set(key.x + key.w / 2, - key.y + key.h / 2 , 0);
 
 					keyboard3d.add(key3d);
 
-					kx+= key.w + padding;
+					kx += key.w + padding;
 
 				 }
-				 ky+= padding + key.h;
+				 ky += padding + key.h;
 			}
 
 			var map = {};
@@ -301,7 +312,6 @@ var stop = false;
 
 
 			"use strict";
-
 
 			var camera, scene, renderer;
 			var geometry, material, mesh;
@@ -356,8 +366,6 @@ var stop = false;
 				scene.add( object );
 
 				scene.add(keyboard3d);
-
-
 
 				hud = document.createElement('div');
 				hud.style.cssText = 'border-radius: 10px;\
