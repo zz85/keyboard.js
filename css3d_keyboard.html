@@ -4,10 +4,12 @@
 		<meta charset="utf-8">
 		<style>
 		body {
-			background: #eee;
+			background: #fefefe;
 			margin: 0;
 			overflow: hidden;
 			color: #333333;
+			background: #111111;
+			color: #fefefe;
 			/*font-family: 'monospace';*/
 			text-align: center;
 
@@ -21,8 +23,8 @@
 
 		#keyboard {
 			position: absolute;
-			left: -400px;
-			top: -200px;
+			/*left: -400px;
+			top: -200px;*/
 
 		}
 
@@ -35,6 +37,7 @@
 			/*border: 1px solid #f9f9f9;*/
 			border: 1px solid #9CCCDF;
 			color: #60B8DB;
+			color: #fefefe;
 			/*font-weight: bold;*/
 			/*1px solid #54E2EE lazer bubble gum*/
 			/*1px solid #D4D0DA matelic*/
@@ -44,9 +47,17 @@
 			-webkit-transition-duration: 0.4s;
 			-webkit-transition-property: all;
 			-webkit-transition-timing-function: ease-out-in;
+
+			cursor: pointer;
+		}
+
+		.key:hover {
+			transform: translateY(-5px);
 		}
 
 		.pressed {
+			/*transform-style: preserve-3d;*/
+
 			/*position: absolute;*/
 
 	/*		top: 1px;
@@ -69,8 +80,7 @@
 				*/
 			/*filter: blur(1px);*/
 
-			
-			cursor: pointer;
+		
 		}
 
 
@@ -141,7 +151,6 @@ possibly -
  -->
 		<div id="container"></div>
 		<script src="https://threejs.org/build/three.min.js"></script>
-
 		<script src="https://threejs.org/examples/js/controls/TrackballControls.js"></script>
 
 		<script src="https://threejs.org/examples/js/renderers/CSS3DRenderer.js"></script>
@@ -251,15 +260,18 @@ possibly -
 						li.addEventListener('click', (function(code) {
 							return function() { console.log(code); typing(code) ; }
 						})(key.char), false);
+
+						// li.addEventListener('mousedown', (function(code) {
+						// 	return function() { console.log(code); typing(code) ; }
+						// })(key.char), false);
 					}
 
 					// key3d = new THREE.CSS3DObject(li);
 					d = document.createElement('div');
 					d.appendChild(li);
 					key3d = new THREE.CSS3DObject(d);
-
-
-					key3d.position.set(key.x + key.w / 2, - key.y + key.h / 2 , 0);
+					key3d.position.set(key.x, - key.y, 0);
+					// key3d.position.set(key.x + key.w / 2, - key.y + key.h / 2 , 0);
 
 					keyboard3d.add(key3d);
 
@@ -357,11 +369,8 @@ possibly -
 				var object = keyboard3d;
 				object.applyMatrix( new THREE.Matrix4().makeRotationX( - Math.PI / 2 ) );
 
-
-
-				object.position.set(0, 0, 00);
 				camera.lookAt(object.position);
-				object.position.set(-330, -200, -100);
+				object.position.set(-330, -240, -150);
 
 				scene.add( object );
 
