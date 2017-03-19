@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<style>
+		body {
+			background: #eee;
+			margin: 0;
+			overflow: hidden;
+			color: #333333;
+			/*font-family: 'monospace';*/
+			text-align: center;
+
+			font: 71%/1.5 Verdana, Sans-Serif;
+
+		}
+
+		#container {
+
+		}
+
+		#keyboard {
+			position: absolute;
+			left: -400px;
+			top: -200px;
+
+		}
+
+		.key {
+
+			line-height: 40px;
+			text-align: center;
+			font-size: 15px;
+			/*background: #fff;*/
+			/*border: 1px solid #f9f9f9;*/
+			border: 1px solid #9CCCDF;
+			color: #60B8DB;
+			/*font-weight: bold;*/
+			/*1px solid #54E2EE lazer bubble gum*/
+			/*1px solid #D4D0DA matelic*/
+
+			border-radius: 5px;
+
+			-webkit-transition-duration: 1s;
+			-webkit-transition-property: all;
+			-webkit-transition-timing-function: ease-in;
+
+
+		}
+
+		.pressed {
+			/*position: relative;*/
+
+	/*		top: 1px;
+			left: 1px;*/
+			/*border-color: #e5e5e5;*/
+
+			font-size: 40px;
+			border-color: #2B9DEB;
+			color: #2B9DEB;
+
+			-webkit-transform: translateZ(200px) rotateX(-90deg) rotateZ(1024deg) rotateX(1028deg);
+			/*-webkit-filter: blur(2px);*/
+			cursor: pointer;
+
+		}
+
+
+		</style>
+	</head>
+	<body>
+<!-- 
+
+	1. Reimport CSS Example
+	2. Simple JS integration
+
+	TASKS:
+		CSS Transitions
+		KEYBOARD - Hotkeys
+		SCramble Code EFfect	
+
+		http://jabtunes.com/notation/jKeyboard.js.php?src=1
+		five3d
+		http://www.lab4games.net/zz85/blog/2010/02/06/online-virtual-keyboard-with-canvas-and-javascript/
+
+
+kb typing behavior - sink down
+text behavior - move up. fly away. matrix effect.
+scramble effect. text particles?
+
+- design your own kb / drag away
+
+
+Five - glow on mouse over
+grey -> blue
+on press, sink down fast, lights off.
+ease in - to go up quickly.
+
+big blue flights to x of target, random x flips;
+
+
+
+2 - 
+3 - fix view
+4 - handling keypress
+5 - migrate to absolute positions
+5b - remove css
+6 - integrate key presses
+6c - numbers and function key presses
+7 - scramble animations
+8 - strip down keyboard
+8b - 3d key css transitions, has trapped problems
+8b2 - floating experiments
+8c - refactored to individual elements?
+	because renderer overwrites transforms, cant use css transitions
+
+	procedural trees with asciis. using music notes. cch/rollercoaster
+/*manual transitions... */ - transition
+
+manually handle tweening.
+
+what to do with HUD?
+replace with editableHTML element?
+use textarea?
+
+  - simple terminal?
+
+// Num Pad
+// Scroll
+
+possibly - 
+- eliza.js
+- gustures $1,
+- js inverted index
+ -->
+		<div id="container"></div>
+		<script src="../build/three.min.js"></script>
+
+		<script src="js/controls/TrackballControls.js"></script>
+
+		<script src="js/renderers/CSS3DRenderer.js"></script>
+		<script src="zutils/resize.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
+
+		<script>
+
+var stop = false;
+			// Keyboard Layout.
+
+			var keyboardCodes = [
+				// [27,112,113,114,115,116,117,118,119,120,121,122,123],
+				[192,49,50,51,52,53,54,55,56,57,48,189,187,8],
+				[9,81,87,69,82,84,89,85,73,79,80,219,221,220],
+				[20,65,83,68,70,71,72,74,75,76,186,222,13],
+				[16,90,88,67,86,66,78,77,188,190,191,16],
+				[17, 18, 91, 32, 93, 18, 17]
+			];
+
+			var keyboard = [
+				// ['esc', 'f1', 'f2', 'f3', 'f4', 'f5', 'f6', 'f7', 'f8', 'f9', 'f10', 'f11', 'f12'],
+				[ '`','1','2','3','4','5','6','7','8','9','0','-','=','delete'],
+				[ 'tab','q','w','e','r','t','y','u','i','o','p','[',']','\\'],
+				[ 'caps','a','s','d','f','g','h','j','k','l', ';','\'','return'],
+				[ 'left-shift','z','x','c','v','b','n','m',',','.','/','right-shift'],
+				[ 'left-ctrl', 'left-alt', 'left-cmd', 'space', 'cmd', 'right-alt', 'right-ctrl']
+			];
+
+			var shiftkeyboard = [
+				// ['esc', 'f1', 'f2', 'f3', 'f4', 'f5', 'f6', 'f7', 'f8', 'f9', 'f10', 'f11', 'f12'],
+				[ '~','!','@','#','$','%','^','&','*','(',')','_','+','DELETE'],
+				[ 'TAB','Q','W','E','R','T','Y','U','I','O','P','[',']','\\'],
+				[ 'CAPS','A','S','D','F','G','H','J','K','L', ':','"','RETURN'],
+				[ 'SHIFT','Z','X','C','V','B','N','M','<','>','?','SHIFT'],
+				[ 'ctrl', 'alt', 'cmd', 'SPACE', 'cmd', 'alt', 'ctrl']
+			];
+
+			var idToCharacters = {};
+			['shift', 'ctrl', 'cmd', 'alt'].forEach(function(a) {
+				idToCharacters['left-' + a] = a;
+				idToCharacters['right-' + a] = a;
+			});
+
+			function lookupCharacter(a) {
+				if (a in idToCharacters) return idToCharacters[a];
+				return a;
+
+			}
+
+
+			var keyboard3d = new THREE.Object3D();
+
+
+			var i, il, r, rl, row, character, li, code, letter;
+
+			var keys = {};
+
+			for (i=0, il=keyboard.length; i<il; i++) {
+				row = keyboard[i]
+				for (r=0, rl=row.length; r<rl; r++) {
+					character = row[r];
+
+					keys[character] = {
+						code: keyboardCodes[i][r],
+						char: lookupCharacter(character),
+						shift: shiftkeyboard[i][r]
+					};
+				}
+			}
+
+			var kx,ky;
+			var padding = 5;
+			ky = 0; // padding
+			var width = 40;
+
+			for (i=0, il=keyboard.length; i<il; i++) {
+				 row = keyboard[i];
+				 kx = 0; // padding
+				 for (r=0, rl=row.length; r<rl; r++) {
+					character = row[r];
+					key = keys[character];
+					key.x = kx;
+					key.y = ky;
+					key.w = lookupwidth(key.char);
+					key.h = width;
+					// key.h = i == 0 ? 34 : width;
+
+					li = document.createElement('li');
+					li.className = 'key';
+					key.dom = li;
+					li.innerHTML = key.char;
+					li.style.width = key.w + 'px';
+					li.style.height = key.h + 'px';
+					li.style.position = 'absolute';
+					// li.style.left = key.x + 'px';
+					// li.style.top = key.y + 'px';
+					li.style.display = 'block';
+					// li.style.webkitTransform = 'translateX(' + key.x + 'px) '
+					// 	+ 'translateY(' + key.y + 'px)';
+
+
+					code = key.char;
+					charcode = code.charCodeAt(0);
+					letter = code.length == 1 && (97 <= charcode && charcode <= 122);
+
+					if (letter) {
+						console.log(key.char);
+						li.addEventListener('click', (function(code) {
+							return function() { console.log(code); typing(code) ; }
+						})(key.char), false);
+					}
+
+					key3d = new THREE.CSS3DObject(li);
+					key3d.position.set(key.x + key.w / 2, - key.y + key.h / 2 , 0);
+
+					keyboard3d.add(key3d);
+
+					kx+= key.w + padding;
+
+				 }
+				 ky+= padding + key.h;
+			}
+
+			var map = {};
+			for (k in keys) {
+				key = keys[k];
+				if (! (key.code in map)) {
+					map[key.code] = [];
+				}
+				map[key.code].push(key);
+			}
+
+			function lookupwidth(c) {
+				switch(c) {
+					case 'tab': return 70;
+					case 'delete': return 70;
+					case 'caps': return 80;
+					case 'return': return 70;
+					case 'shift': return 100;
+					case 'reserved': return 100;
+					case 'space': return 656 - (50 + 5 )* 6;
+					case 'ctrl': return 50;
+					case 'cmd': return 50;
+					case 'alt': return 50;
+					default:
+						if (c.match(/f.*/)) return 46;
+						return 40;
+				}
+         	 }
+
+			// console.log(JSON.stringify(keys));
+
+			var shift = false;
+
+			keys['left-shift'].dom.addEventListener('click', function() {
+				shift = !shift;
+				var target;
+				for (var r in ids) {
+					target = ids[r];
+					target.dom.innerHTML = shift ? target.shift : target.character;
+				}
+
+			}, false);
+
+
+			"use strict";
+
+
+			var camera, scene, renderer;
+			var geometry, material, mesh;
+			var controls;
+			var stats;
+
+
+			var last = Date.now();
+			var hud;
+
+
+			var frontPanel;
+
+			init();
+			animate();
+
+			function init() {
+
+				camera = new THREE.PerspectiveCamera( 53, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera.position.set( 0, 300, 300 );
+
+				controls = new THREE.TrackballControls( camera );
+
+				scene = new THREE.Scene();
+
+
+
+				var object = keyboard3d;
+				object.applyMatrix( new THREE.Matrix4().makeRotationX( - Math.PI / 2 ) );
+
+
+
+				object.position.set(0, 0, 00);
+				camera.lookAt(object.position);
+				object.position.set(0, -200, -100);
+
+				// scene.add( object );
+
+				scene.add(keyboard3d);
+
+
+
+				hud = document.createElement('div');
+				hud.style.cssText = 'border-radius: 10px;\
+				font-size: 70px;\
+				border: 1px solid #999999;\
+				width: 600px;\
+				height: 100px;\
+				';
+
+				hud.innerHTML = 'hello';
+
+				frontPanel = new THREE.CSS3DObject(hud);
+				frontPanel.position.z = -100;
+				frontPanel.scale.multiplyScalar(0.8);
+				scene.add(frontPanel);
+
+
+				renderer = new THREE.CSS3DRenderer();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.domElement.style.position = 'absolute';
+				renderer.domElement.style.top = 0;
+				var container = document.getElementById('container');
+				container.appendChild( renderer.domElement );
+
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				document.body.appendChild( stats.domElement );
+
+				// window.addEventListener( 'keydown', keydown, false );
+				z.resize();
+
+				document.addEventListener('keypress', keypress, false);
+				document.addEventListener('keydown', keydown, false);
+				document.addEventListener('keyup', keyup, false);
+
+				var presses = {};
+
+				function keydown(e) {
+					// e.stopPropagation();
+					// e.preventDefault();
+					console.log('down', e.which);
+					presses[e.which] = 'on';
+					keys =  map[e.which];
+					if (!keys) return;
+					// key.dom.style.ocolor = key.dom.style.color;
+					// key.dom.style.color = 'red';
+					for (k=0;k<keys.length;k++) {
+						key = keys[k];
+						key.dom.className = 'key pressed';
+					}
+
+					window.e = e;
+					if (e.which==8) {
+						hud.innerHTML = hud.innerHTML.substring(0, hud.innerHTML.length-1);
+						e.preventDefault();
+					}
+					// console.log(key, key.dom.className);
+
+				}
+
+				function keyup(e) {
+					delete presses[e.which];
+
+					keys =  map[e.which];
+					if (!keys) return;
+
+					for (k=0;k<keys.length;k++) {
+						key = keys[k];
+						key.dom.className = 'key';
+					}
+					e.preventDefault();
+				}
+
+				function keypress(e) {
+					chardown = String.fromCharCode(e.charCode);
+					 console.log('press', e.which, e.charCode, chardown);
+					 // Printable characters
+
+					 typing(chardown);
+					 e.preventDefault();
+				}
+
+			}
+
+			function typing(chardown) {
+				hud.innerHTML += chardown;
+			}
+
+			function animate() {
+
+				var now = Date.now();
+				var delta = now - last;
+				last = now;
+
+				if (!stop) requestAnimationFrame( animate );
+
+				controls.update();
+
+				renderer.render( scene, camera );
+				stats.update();
+			}
+
+		</script>
+	</body>
+</html>
