@@ -1,15 +1,20 @@
 Keyboard.js
 
-Adding some old javascript code which I found relating to virtual keyboards.
+Some virtualized on screen keyboard experiments.
 
-First is a keyboard in implemented in Canvas.
+Current experiments
+- Canvas Keyboard that integrates with HTML input elements
+- Swype alternative with dictionary
+- CSS3D version
 
-Then is an attempt to build a swype alternative with dictionary.
+Warning, some of these code is really old (from 2010).
 
-There was a bookmarklet.
- 
-There was also a thought to also add chinese support for it. 
- 
-And there was a 3d version.
+I found them and thought that it would be good to keep the virtual keyboards on github.
+It is also one of my early experiments with canvas and bookmarklets.
+So yeah, it needs some maintainance and modernization for it to be working nicely again.
 
-I found this out of my attic archival, and it needs some maintainance and modernization for it to be working nicely again.
+But here's some ideas on what can be done.
+1. Add chinese/pinyin support for glide/swipe input
+2. Add touchstart input for keyboard
+3. Experiment with different layouts (like Microsoft Word Flow keyboard)
+4. VR / A-Frame keyboard
