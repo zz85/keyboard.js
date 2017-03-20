@@ -137,22 +137,35 @@ TODO / IDEAs
 				// 	+ 'translateY(' + key.y + 'px)';
 
 				const code = key.char;
-				const charcode = code.charCodeAt(0);
-
 				const letter = code.length === 1;
+
+				// const charcode = code.charCodeAt(0);
 				//  && (97 <= charcode && charcode <= 122);
-
-				// console.log('z', key.char, String.fromCharCode(charcode));
-
 
 				li.addEventListener('click', function() {
 					console.log(code, letter);
 					if (letter) {
 						typing(!shift ? code : key.shift);
+					}
 
-						if (shift) {
-
-						}
+					switch (code) {
+						case 'tab':
+							typing('\t');
+							break;
+						case 'return':
+							typing('\n');
+							break;
+						case 'space':
+							typing(' ');
+							break;
+						case 'shift':
+							shift = !shift;
+							toggleshift(shift);
+							break;
+						case 'caps':
+							shift = !shift;
+							toggleshift(shift);
+							break;
 					}
 				});
 
@@ -187,10 +200,10 @@ TODO / IDEAs
 
 			var shift = false;
 
-			keys['left-shift'].dom.addEventListener('click', () => {
-				shift = !shift;
-				toggleshift(shift);
-			});
+			// keys['left-shift'].dom.addEventListener('click', () => {
+			// 	shift = !shift;
+			// 	toggleshift(shift);
+			// });
 
 			const backspace = () => {
 				// console.log('backspace');
