@@ -150,165 +150,61 @@ possibly -
 - js inverted index
  -->
 		<div id="container"></div>
-		<script src="https://threejs.org/build/three.min.js"></script>
-		<script src="https://threejs.org/examples/js/controls/TrackballControls.js"></script>
+		<script src="vendor/three.js/build/three.min.js"></script>
+		<script src="vendor/three.js/examples/js/controls/TrackballControls.js"></script>
 
-		<script src="https://threejs.org/examples/js/renderers/CSS3DRenderer.js"></script>
-		<script src="https://threejs.org/examples/js/libs/stats.min.js"></script>
+		<script src="vendor/three.js/examples/js/renderers/CSS3DRenderer.js"></script>
+		<script src="vendor/three.js/examples/js/libs/stats.min.js"></script>
 
+		<script src="keyboard.js"></script>
 
 		<script>
 			var stop = false;
-			// Keyboard Layout.
-
-			var keyboardCodes = [
-				// [27,112,113,114,115,116,117,118,119,120,121,122,123],
-				[192,49,50,51,52,53,54,55,56,57,48,189,187,8],
-				[9,81,87,69,82,84,89,85,73,79,80,219,221,220],
-				[20,65,83,68,70,71,72,74,75,76,186,222,13],
-				[16,90,88,67,86,66,78,77,188,190,191,16],
-				[17, 18, 91, 32, 93, 18, 17]
-			];
-
-			var keyboard = [
-				// ['esc', 'f1', 'f2', 'f3', 'f4', 'f5', 'f6', 'f7', 'f8', 'f9', 'f10', 'f11', 'f12'],
-				[ '`','1','2','3','4','5','6','7','8','9','0','-','=','delete'],
-				[ 'tab','q','w','e','r','t','y','u','i','o','p','[',']','\\'],
-				[ 'caps','a','s','d','f','g','h','j','k','l', ';','\'','return'],
-				[ 'left-shift','z','x','c','v','b','n','m',',','.','/','right-shift'],
-				[ 'left-ctrl', 'left-alt', 'left-cmd', 'space', 'cmd', 'right-alt', 'right-ctrl']
-			];
-
-			var shiftkeyboard = [
-				// ['esc', 'f1', 'f2', 'f3', 'f4', 'f5', 'f6', 'f7', 'f8', 'f9', 'f10', 'f11', 'f12'],
-				[ '~','!','@','#','$','%','^','&','*','(',')','_','+','DELETE'],
-				[ 'TAB','Q','W','E','R','T','Y','U','I','O','P','[',']','\\'],
-				[ 'CAPS','A','S','D','F','G','H','J','K','L', ':','"','RETURN'],
-				[ 'SHIFT','Z','X','C','V','B','N','M','<','>','?','SHIFT'],
-				[ 'ctrl', 'alt', 'cmd', 'SPACE', 'cmd', 'alt', 'ctrl']
-			];
-
-			var idToCharacters = {};
-			['shift', 'ctrl', 'cmd', 'alt'].forEach(function(a) {
-				idToCharacters['left-' + a] = a;
-				idToCharacters['right-' + a] = a;
-			});
-
-			function lookupCharacter(a) {
-				if (a in idToCharacters) return idToCharacters[a];
-				return a;
-			}
-
-
+			
 			var keyboard3d = new THREE.Object3D();
 
+			Object.keys(keys).forEach(key_id => {
+				key = keys[key_id];
+				li = document.createElement('li');
+				li.className = 'key';
+				key.dom = li;
+				li.innerHTML = key.char;
+				li.style.width = key.w + 'px';
+				li.style.height = key.h + 'px';
+				li.style.position = 'absolute';
+				// li.style.left = key.x + 'px';
+				// li.style.top = key.y + 'px';
+				li.style.display = 'block';
+				// li.style.webkitTransform = 'translateX(' + key.x + 'px) '
+				// 	+ 'translateY(' + key.y + 'px)';
 
-			var i, il, r, rl, row, character, li, code, letter;
-
-			var keys = {};
-
-			for (i=0, il=keyboard.length; i<il; i++) {
-				row = keyboard[i]
-				for (r=0, rl=row.length; r<rl; r++) {
-					character = row[r];
-
-					keys[character] = {
-						code: keyboardCodes[i][r],
-						char: lookupCharacter(character),
-						shift: shiftkeyboard[i][r]
-					};
-				}
-			}
-
-			var kx,ky;
-			var padding = 5;
-			ky = 0; // padding
-			var width = 40;
-
-			for (i=0, il=keyboard.length; i<il; i++) {
-				 row = keyboard[i];
-				 kx = 0; // padding
-				 for (r=0, rl=row.length; r<rl; r++) {
-					character = row[r];
-					key = keys[character];
-					key.x = kx;
-					key.y = ky;
-					key.w = lookupwidth(key.char);
-					key.h = width;
-					// key.h = i == 0 ? 34 : width;
-
-					li = document.createElement('li');
-					li.className = 'key';
-					key.dom = li;
-					li.innerHTML = key.char;
-					li.style.width = key.w + 'px';
-					li.style.height = key.h + 'px';
-					li.style.position = 'absolute';
-					// li.style.left = key.x + 'px';
-					// li.style.top = key.y + 'px';
-					li.style.display = 'block';
-					// li.style.webkitTransform = 'translateX(' + key.x + 'px) '
-					// 	+ 'translateY(' + key.y + 'px)';
-
-
-					code = key.char;
-					charcode = code.charCodeAt(0);
+				code = key.char;
+				charcode = code.charCodeAt(0);
 					letter = code.length == 1 && (97 <= charcode && charcode <= 122);
 
 					if (letter) {
 						console.log(key.char);
-						li.addEventListener('click', (function(code) {
-							return function() { console.log(code); typing(code) ; }
-						})(key.char), false);
+						li.addEventListener('click', function() {
+							console.log(code);
+							typing(code);
+						}, false);
+						
 
 						// li.addEventListener('mousedown', (function(code) {
 						// 	return function() { console.log(code); typing(code) ; }
 						// })(key.char), false);
 					}
 
-					// key3d = new THREE.CSS3DObject(li);
 					d = document.createElement('div');
 					d.appendChild(li);
+
 					key3d = new THREE.CSS3DObject(d);
 					key3d.position.set(key.x, - key.y, 0);
+
 					// key3d.position.set(key.x + key.w / 2, - key.y + key.h / 2 , 0);
 
 					keyboard3d.add(key3d);
-
-					kx += key.w + padding;
-
-				 }
-				 ky += padding + key.h;
-			}
-
-			var map = {};
-			for (k in keys) {
-				key = keys[k];
-				if (! (key.code in map)) {
-					map[key.code] = [];
-				}
-				map[key.code].push(key);
-			}
-
-			function lookupwidth(c) {
-				switch(c) {
-					case 'tab': return 70;
-					case 'delete': return 70;
-					case 'caps': return 80;
-					case 'return': return 70;
-					case 'shift': return 100;
-					case 'reserved': return 100;
-					case 'space': return 656 - (50 + 5 )* 6;
-					case 'ctrl': return 50;
-					case 'cmd': return 50;
-					case 'alt': return 50;
-					default:
-						if (c.match(/f.*/)) return 46;
-						return 40;
-				}
-         	 }
-
-			// console.log(JSON.stringify(keys));
+			})
 
 			var shift = false;
 
