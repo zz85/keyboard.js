@@ -89,65 +89,23 @@
 	<body>
 <!-- 
 
-	1. Reimport CSS Example
-	2. Simple JS integration
+References
+- http://www.lab4games.net/zz85/blog/2010/02/06/online-virtual-keyboard-with-canvas-and-javascript/
+- http://blurspline.com/notation/jKeyboard.js.php?src=1
+- five3d
+		
 
-	TASKS:
-		CSS Transitions
-		KEYBOARD - Hotkeys
-		SCramble Code EFfect	
-
-		http://jabtunes.com/notation/jKeyboard.js.php?src=1
-		five3d
-		http://www.lab4games.net/zz85/blog/2010/02/06/online-virtual-keyboard-with-canvas-and-javascript/
-
-
-kb typing behavior - sink down
-text behavior - move up. fly away. matrix effect.
-scramble effect. text particles?
+TODO / IDEAs
+- Keycode Mapping
+- kb typing behavior - sink down
+- text behavior - move up. fly away. matrix effect.
+- scramble effect. text particles?
 
 - design your own kb / drag away
+- tweening manually.
 
-
-Five - glow on mouse over
-grey -> blue
-on press, sink down fast, lights off.
-ease in - to go up quickly.
-
-big blue flights to x of target, random x flips;
-
-2 - 
-3 - fix view
-4 - handling keypress
-5 - migrate to absolute positions
-5b - remove css
-6 - integrate key presses
-6c - numbers and function key presses
-7 - scramble animations
-8 - strip down keyboard
-8b - 3d key css transitions, has trapped problems
-8b2 - floating experiments
-8c - refactored to individual elements?
-	because renderer overwrites transforms, cant use css transitions
-
-	procedural trees with asciis. using music notes. cch/rollercoaster
-/*manual transitions... */ - transition
-
-manually handle tweening.
-
-what to do with HUD?
-replace with editableHTML element?
-use textarea?
-
-  - simple terminal?
-
-// Num Pad
-// Scroll
-
-possibly - 
-- eliza.js
-- gustures $1,
-- js inverted index
+- what to do with HUD? editableHTML element / textarea?
+- terminal integration
  -->
 		<div id="container"></div>
 		<script src="vendor/three.js/build/three.min.js"></script>
@@ -178,32 +136,33 @@ possibly -
 				// li.style.webkitTransform = 'translateX(' + key.x + 'px) '
 				// 	+ 'translateY(' + key.y + 'px)';
 
-				code = key.char;
+				const code = key.char;
 				charcode = code.charCodeAt(0);
-					letter = code.length == 1 && (97 <= charcode && charcode <= 122);
+				letter = code.length == 1 && (97 <= charcode && charcode <= 122);
 
-					if (letter) {
-						console.log(key.char);
-						li.addEventListener('click', function() {
-							console.log(code);
-							typing(code);
-						}, false);
-						
+				if (letter) {
+					console.log(key.char);
+					// li.addEventListener('click', function() {
+					// 	console.log(code);
+					// 	typing(code);
+					// }, false);
+					
 
-						// li.addEventListener('mousedown', (function(code) {
-						// 	return function() { console.log(code); typing(code) ; }
-						// })(key.char), false);
-					}
+					li.addEventListener('mousedown', function() {
+						console.log(code);
+						typing(code);
+					}, false);
+				}
 
-					d = document.createElement('div');
-					d.appendChild(li);
+				d = document.createElement('div');
+				d.appendChild(li);
 
-					key3d = new THREE.CSS3DObject(d);
-					key3d.position.set(key.x, - key.y, 0);
+				key3d = new THREE.CSS3DObject(d);
+				key3d.position.set(key.x, - key.y, 0);
 
-					// key3d.position.set(key.x + key.w / 2, - key.y + key.h / 2 , 0);
+				// key3d.position.set(key.x + key.w / 2, - key.y + key.h / 2 , 0);
 
-					keyboard3d.add(key3d);
+				keyboard3d.add(key3d);
 			})
 
 			var shift = false;
@@ -257,7 +216,7 @@ possibly -
 				camera.position.set( 0, 300, 300 );
 
 				controls = new THREE.TrackballControls( camera );
-
+				// controls.enabled = false;
 				scene = new THREE.Scene();
 
 

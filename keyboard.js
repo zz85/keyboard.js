@@ -62,7 +62,7 @@ var padding = 5;
 var ky = 0;
 var width = 40;
 
-var i, il, r, rl, row, character, code, letter;
+var i, il, r, rl, row, character, letter;
 
 var keys = {};
 
@@ -91,7 +91,6 @@ for (i=0, il=keyboard.length; i<il; i++) {
         key.h = width;
         key.h = i == 0 ? 34 : width;
 
-        code = key.char;
         kx += key.w + padding;
     }
     
