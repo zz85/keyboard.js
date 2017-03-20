@@ -93,7 +93,7 @@ for (i=0, il=keyboard.length; i<il; i++) {
 
         kx += key.w + padding;
     }
-    
+
     ky += padding + key.h;
 }
 
@@ -109,5 +109,4 @@ for (k in keys) {
 }
 
 // console.log('map', map);
-
-console.log('keys', keys);
+// console.log('keys', keys);

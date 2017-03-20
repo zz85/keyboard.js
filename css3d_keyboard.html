@@ -80,20 +80,20 @@
 				*/
 			/*filter: blur(1px);*/
 
-		
+
 		}
 
 
 		</style>
 	</head>
 	<body>
-<!-- 
+<!--
 
 References
 - http://www.lab4games.net/zz85/blog/2010/02/06/online-virtual-keyboard-with-canvas-and-javascript/
 - http://blurspline.com/notation/jKeyboard.js.php?src=1
 - five3d
-		
+
 
 TODO / IDEAs
 - Keycode Mapping
@@ -118,22 +118,24 @@ TODO / IDEAs
 
 		<script>
 			var stop = false;
-			
+
 			var keyboard3d = new THREE.Object3D();
 
 			Object.keys(keys).forEach(key_id => {
-				key = keys[key_id];
-				li = document.createElement('li');
+				const key = keys[key_id];
+				const li = document.createElement('li');
 				li.className = 'key';
 				key.dom = li;
 				li.innerHTML = key.char;
+
 				li.style.width = key.w + 'px';
 				li.style.height = key.h + 'px';
 				li.style.position = 'absolute';
+				li.style.display = 'block';
+
 				// li.style.left = key.x + 'px';
 				// li.style.top = key.y + 'px';
-				li.style.display = 'block';
-				// li.style.webkitTransform = 'translateX(' + key.x + 'px) '
+				// li.style.transform = 'translateX(' + key.x + 'px) '
 				// 	+ 'translateY(' + key.y + 'px)';
 
 				const code = key.char;
@@ -141,28 +143,26 @@ TODO / IDEAs
 				letter = code.length == 1 && (97 <= charcode && charcode <= 122);
 
 				if (letter) {
-					console.log(key.char);
-					// li.addEventListener('click', function() {
-					// 	console.log(code);
-					// 	typing(code);
-					// }, false);
-					
-
-					li.addEventListener('mousedown', function() {
+					li.addEventListener('click', function() {
 						console.log(code);
 						typing(code);
 					}, false);
+
+					// li.addEventListener('mousedown', function() {
+					// 	console.log(code);
+					// 	typing(code);
+					// }, false);
 				}
 
-				d = document.createElement('div');
+				const d = document.createElement('div');
 				d.appendChild(li);
 
 				key3d = new THREE.CSS3DObject(d);
-				key3d.position.set(key.x, - key.y, 0);
+				keyboard3d.add(key3d);
 
+				key3d.position.set(key.x, - key.y, 0);
 				// key3d.position.set(key.x + key.w / 2, - key.y + key.h / 2 , 0);
 
-				keyboard3d.add(key3d);
 			})
 
 			var shift = false;
@@ -188,7 +188,6 @@ TODO / IDEAs
 
 			var last = Date.now();
 			var hud;
-
 
 			var frontPanel;
 
@@ -219,24 +218,19 @@ TODO / IDEAs
 				// controls.enabled = false;
 				scene = new THREE.Scene();
 
-
-
 				var object = keyboard3d;
 				object.applyMatrix( new THREE.Matrix4().makeRotationX( - Math.PI / 2 ) );
 
 				camera.lookAt(object.position);
 				object.position.set(-330, -240, -150);
-
-				scene.add( object );
-
 				scene.add(keyboard3d);
 
 				hud = document.createElement('div');
 				hud.style.cssText = 'border-radius: 10px;\
-				font-size: 70px;\
-				border: 1px solid #999999;\
-				width: 600px;\
-				height: 100px;\
+					font-size: 70px;\
+					border: 1px solid #999999;\
+					width: 600px;\
+					height: 100px;\
 				';
 
 				hud.innerHTML = 'hello';

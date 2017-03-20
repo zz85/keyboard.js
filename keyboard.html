@@ -6,21 +6,21 @@
 <title>Keyboard Experiment</title>
 <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
 <style type="text/css" media="screen">
-	
+
 body { background-color: #fee; font: 15px Helvetica, Arial; color: #000; }
 
- #target {  
- margin: 0 0 5px;  
- padding: 5px;  
- width: 671px;  
- height: 200px;  
- font: 1em/1.5 Verdana, Sans-Serif;  
- background: fff;  
- border: 1px solid f9f9f9;  
- -moz-border-radius: 5px;  
- -webkit-border-radius: 5px;  
- } 
- 
+ #target {
+ margin: 0 0 5px;
+ padding: 5px;
+ width: 671px;
+ height: 200px;
+ font: 1em/1.5 Verdana, Sans-Serif;
+ background: fff;
+ border: 1px solid f9f9f9;
+ -moz-border-radius: 5px;
+ -webkit-border-radius: 5px;
+ }
+
  #omw_canvas {
  	 /*border: dashed 1px black;*/
  	 padding:5px;
@@ -63,7 +63,7 @@ function jdictdecompress() {
 	var nword,w;
 	for (var i in dict2) {
 		nword = re.exec(dict2[i]);
-		
+
 		n = parseInt(nword[1]);
 		 w = lastword.substr(0,n) + nword[2];
 		//dict.push(w);
@@ -79,22 +79,22 @@ c1();
 <script>
 c2('For compress jdict file');
 c1();
-dict= jdictdecompress(jdictcompressed); 
+dict= jdictdecompress(jdictcompressed);
 c2('Decompressing takes');
 function simpleSprite() { return {
-	
+
 }
 }
 
 function Sprite(o) {
 	var s = simpleSprite();
-	
+
 	// Use new keys
 	for (var k in o) {
 		s[k] = o[k];
-		
+
 	}
-	
+
 	return s;
 }
 
@@ -105,23 +105,23 @@ function frameRate() {
 		strokes.push({x:e.x, y:e.y});
 		kbCanvas.mousemove(e);
 		kbCanvas.paint();
-		
+
 		if (drawing) {
 			ctx.beginPath();
 			ctx.moveTo(strokes[0].x,strokes[0].y);
-			
+
 			for (var s=1; s<strokes.length;s++) {
 				ctx.lineTo(strokes[s].x,strokes[s].y);
 			}
 			ctx.stroke();
 		}
 		events = [];
-	} 
-	
+	}
+
 	//$('#out').html('Nothing');
-		
-	
-	
+
+
+
 }
 
 function levenshtein(str1, str2) {
@@ -141,7 +141,7 @@ function levenshtein(str1, str2) {
         for (j = 1 ; j <= l2 ; j++) {
             d[i][j] = Math.min(
                 d[i - 1][j] + 1,
-                d[i][j - 1] + 1, 
+                d[i][j - 1] + 1,
                 d[i - 1][j - 1] + (str1.charAt(i - 1) === str2.charAt(j - 1) ? 0 : 1)
             );
         }
@@ -151,15 +151,15 @@ function levenshtein(str1, str2) {
 
 $(document).ready(function() {
 		 canvas = $('#omw_canvas')[0];
-         	  if (!canvas.getContext){ 
+         	  if (!canvas.getContext){
          	 	 alert("Sorry, your browser does not support html 5 canvas. Please try with another browser!!");
          	 	 return;
          	 }
          	  ctx = canvas.getContext("2d");
          	 CanvasTextFunctions.enable(ctx);
-         	 
+
          	  kbCanvas = {
-         	 	elements:[],	
+         	 	elements:[],
          	 	paint:function() {
          	 		ctx.clearRect(0,0,canvas.width,canvas.height);
          	 		for (var e in this.elements) {
@@ -169,31 +169,31 @@ $(document).ready(function() {
 			mousemove:function(e) {
 				if (clicked) {
 					drawing = true;
-					
+
 				}
 				$('#out').html('Mouse moving');
-				var hit = false; 
+				var hit = false;
 				for (var o in this.elements) {
 					var o2 = this.elements[o];
-					
-					
+
+
 					if (o2.clicked) {
 						o2.isdragged = true;
-						if (typeof o2.drag == 'function') 
+						if (typeof o2.drag == 'function')
 						o2.drag(e);
 					}
-					
+
 					if (typeof o2.hover != 'function') continue;
-					
-					
+
+
 					if ((o2.x<e.x)&&(o2.y<e.y)&&
 						((o2.x+o2.w)>e.x)&&
 						((o2.y+o2.h)>e.y)) {
-						
-						if (typeof o2.hover == 'function') 
+
+						if (typeof o2.hover == 'function')
 							o2.hover(e);
 						hit = true;
-						
+
 					} else {
 						if (o2.ishover) {
 							o2.hoveroff(e);
@@ -212,15 +212,15 @@ $(document).ready(function() {
 				$('#out').html('Mouse Down');
 				for (var o in this.elements) {
 					var o2 = this.elements[o];
-					
+
 					if ((o2.x<e.x)&&(o2.y<e.y)&&
 						((o2.x+o2.w)>e.x)&&
 						((o2.y+o2.h)>e.y)) {
 						o2.clicked = true;
-						
-						if (typeof o2.mousedown == 'function') 
+
+						if (typeof o2.mousedown == 'function')
 						o2.mousedown(e);
-						
+
 						break;
 					}
 				}
@@ -240,20 +240,20 @@ for (var i in dict) {
 hh=dict[i].toLowerCase();
 	if (fitin2(hh, understandWord)) {
 		var score =1;
-		
+
 		score += fitin(hh, understandWord);
 		/*
-		
+
 		score += hh.length  / understandWord.length*4;
 		*/
 		score /= levenshtein(understandWord,hh ) ;
 		if (hh[0]==understandWord[0]) score*= 1.5;
 		if (hh[hh.length-1]==understandWord[understandWord.length-1]) score *= 1.5;
 		/*
-		
+
 		*/
 		//dictionary common words score
-		// 
+		//
 		/*
 		// try http://en.wikibooks.org/wiki/Algorithm_Implementation/Strings/Levenshtein_distance#JavaScript
 		//Algo 5 . Edit distance
@@ -264,7 +264,7 @@ hh=dict[i].toLowerCase();
 		var score =0;
 		score += hh.length  / understandWord.length;
 		if (hh[0]==understandWord[0]) score*= 1.1;
-		if (hh[hh.length-1]==understandWord[understandWord.length-1]) score *= 1.1;	
+		if (hh[hh.length-1]==understandWord[understandWord.length-1]) score *= 1.1;
 		*/
 		/*
 		Algo 2 - Emphasis on End points
@@ -273,20 +273,20 @@ hh=dict[i].toLowerCase();
 		if (hh[hh.length-1]==understandWord[understandWord.length-1]) score += 0.5;
 		score += hh.length  / understandWord.length;
 		*/
-		
+
 		/* Algo 3 End points and Length Multiplier
 		var score =0;
 		if (hh[0]==understandWord[0]) score+= 0.5;
 		if (hh[hh.length-1]==understandWord[understandWord.length-1]) score += 0.5;
 		score += hh.length  / understandWord.length*4;
 		*/
-		
+
 		var entry = {w:hh, s:score, toString:function() {return this.w; } }; // Word and Score
 		//+ this.s
 		suggest.push(entry);
 		chose ++;
 	}
-	c++;	
+	c++;
 }
 
 function sortByLength(a,b)
@@ -315,7 +315,7 @@ c2('Suggestions takes');
 				}
 			}
          	 };
-         	 
+
 
          	 // Fuzzy score???? Fit in, Approximity by position, Score by matchness
          	 function fitin(a,b) {
@@ -325,105 +325,105 @@ c2('Suggestions takes');
 				var x = b.indexOf(a[i]);
 				if (x<0) return c;
 				b = b.substr(x+1);
-				lowest = x;	
+				lowest = x;
 				c++;
 			}
 			return c;
 		}
-		
-		
+
+
          	function fitin2(a,b) {
          		if (a.length > b.length) return false;
          		if ((a[0]==b[0]) &&
          		 (a[a.length-1]==b[b.length-1]))
          		return true;
-         		
+
          		return false;
 			var lowest = -1;
 			for (var i in a) {
 				var x = b.indexOf(a[i]);
 				if (x<0) return false;
 				b = b.substr(x+1);
-				lowest = x;	
+				lowest = x;
 			}
 			return true;
 		}
-		
-		
+
+
          	 var kbItems = [];
          	 kbItems[0] = [ '`','1','2','3','4','5','6','7','8','9','0','-','=','delete'];
          	 kbItems[1] = [ 'tab','q','w','e','r','t','y','u','i','o','p','[',']','\\'];
          	 kbItems[2] = [ 'caps','a','s','d','f','g','h','j','k','l', ';','\'','enter'];
          	 kbItems[4] = [ 'shift','z','x','c','v','b','n','m',',','.','/','shift'];
          	 kbItems[5] = [ 'space'];
-         	 
+
          	 // CAPS
-         	 
-		function roundedRect(ctx,x,y,width,height,radius,hover, click){  
-			ctx.beginPath();  
-			ctx.moveTo(x,y+radius);  
-			ctx.lineTo(x,y+height-radius);  
-			ctx.quadraticCurveTo(x,y+height,x+radius,y+height);  
-			ctx.lineTo(x+width-radius,y+height);  
-			ctx.quadraticCurveTo(x+width,y+height,x+width,y+height-radius);  
-			ctx.lineTo(x+width,y+radius);  
-			ctx.quadraticCurveTo(x+width,y,x+width-radius,y);  
-			ctx.lineTo(x+radius,y);  
-			ctx.quadraticCurveTo(x,y,x,y+radius);  
-			
+
+		function roundedRect(ctx,x,y,width,height,radius,hover, click){
+			ctx.beginPath();
+			ctx.moveTo(x,y+radius);
+			ctx.lineTo(x,y+height-radius);
+			ctx.quadraticCurveTo(x,y+height,x+radius,y+height);
+			ctx.lineTo(x+width-radius,y+height);
+			ctx.quadraticCurveTo(x+width,y+height,x+width,y+height-radius);
+			ctx.lineTo(x+width,y+radius);
+			ctx.quadraticCurveTo(x+width,y,x+width-radius,y);
+			ctx.lineTo(x+radius,y);
+			ctx.quadraticCurveTo(x,y,x,y+radius);
+
 			// 000 333 666 dark light ligher
 			// click hover default 000 555 aaa , 000 999 555
 			if (click) {
 				ctx.strokeStyle = "#000";
 				ctx.stroke();
-				
-			} else 
+
+			} else
 			if (hover) {
 				ctx.strokeStyle = "#999";
-				
+
 				ctx.stroke();
-				//ctx.fillStyle = "yellow"; 
-				//ctx.fill();  
+				//ctx.fillStyle = "yellow";
+				//ctx.fill();
 			} else {
 				ctx.strokeStyle = "#555";
 				ctx.stroke();
 			}
-		}  
-		
+		}
+
 		function hover() {
 			$('#out').html(':)');
 			if (!this.ishover && drawing) {
 				trashLetters.push(this.txt);
-			 	 
+
 			 }
 			this.ishover = true;
 			//kbCanvas.paint();
 			 $('#omw_canvas').css({cursor:'pointer'});
-			 
+
 		}
-		
+
 		function hoveroff() {
 			this.ishover = false;
 			this.ispress = false;
 			 $('#omw_canvas').css({cursor:'auto'});
 		}
-		
+
 		function mousepress() {
 			this.ispress = true;
 			if (!sMode) $('#target').val($('#target').val()+this.txt);
 			else trashLetters.push(this.txt);
 		}
-		
+
 		function mouseup() {
 			this.ispress = false;
 		}
-         	 
+
          	 function paint() {
-         	 	 roundedRect(ctx, this.x , this.y, this.w, this.h, 5, this.ishover, this.ispress ); 
+         	 	 roundedRect(ctx, this.x , this.y, this.w, this.h, 5, this.ishover, this.ispress );
          	 	 //ctx.strokeRect(this.x , this.y, this.w, this.h ); //ctx.fillText(this.txt, this.x + this.w/2, this.y + this.h/2);
          	 	 ctx.drawTextCenter(null,12,this.x + this.w/2, this.y + this.h/2+5, this.txt);
          	 }
-         	 
+
          	 function lookupwidth(c) {
          	 	 if (c=='tab') return 70;
          	 	 if (c=='delete') return 70;
@@ -431,10 +431,10 @@ c2('Suggestions takes');
          	 	 if (c=='enter') return 77;
          	 	 if (c=='shift') return 97;
          	 	 if (c=='space') return 660;
-         	 	 
+
          	 	 return 40;
          	 }
-         	 
+
          	 var kx,ky;
          	 var padding = 5;
          	 ky = padding;
@@ -442,8 +442,8 @@ c2('Suggestions takes');
          	 	 kx = padding;
          	 	 for (i2 in kbItems[i1]) {
          	 	 	 var key1 = kbItems[i1][i2]
-         	 	 	 
-         	 	 	 var item = {txt: key1, x:kx, y:ky, w:lookupwidth(key1), h:40, 
+
+         	 	 	 var item = {txt: key1, x:kx, y:ky, w:lookupwidth(key1), h:40,
          	 	 	 paint:paint, hover:hover, hoveroff:hoveroff,
          	 	 	 mousedown:mousepress, mouseup:mouseup};
          	 	 	 kx+= item.w + padding;
@@ -451,27 +451,27 @@ c2('Suggestions takes');
          	 	 }
          	 	 ky+= padding + 40;
          	 }
-         	 
-         	 
-         	 
+
+
+
 		$('#omw_canvas').mousemove(function(e) {
 			var x = e.pageX - $(this).offset().left;
 			var y = e.pageY - $(this).offset().top;
 			//kbCanvas.mousemove({x:x,y:y});
 			events['mousemove'] = {x:x,y:y};
-			
+
 		}).mousedown(function(e) {
 			var x = e.pageX - $(this).offset().left;
 			var y = e.pageY - $(this).offset().top;
 			kbCanvas.mousedown({x:x,y:y});
-			
+
 		}).mouseup(function(e) {
 			var x = e.pageX - $(this).offset().left;
 			var y = e.pageY - $(this).offset().top;
 			kbCanvas.mouseup({x:x,y:y});
 		});
 		kbCanvas.paint();
-		
+
 		var fps = 50;
 		setInterval(frameRate,1000/fps);
 });
@@ -479,7 +479,7 @@ c2('Suggestions takes');
 
 
 //
-// This code is released to the public domain by Jim Studt, 2007. 
+// This code is released to the public domain by Jim Studt, 2007.
 // Corrected a mistake with ; by Joshua Koo
 // He may keep some sort of up to date copy at http://www.federated.com/~jim/canvastext/
 //
@@ -655,13 +655,13 @@ CanvasTextFunctions.enable = function( ctx)
     ctx.fontAscent = function(font,size) { return CanvasTextFunctions.ascent(font,size); }
     ctx.fontDescent = function(font,size) { return CanvasTextFunctions.descent(font,size); }
 
-    ctx.drawTextRight = function(font,size,x,y,text) { 
+    ctx.drawTextRight = function(font,size,x,y,text) {
 	var w = CanvasTextFunctions.measure(font,size,text);
-	return CanvasTextFunctions.draw( ctx, font,size,x-w,y,text); 
+	return CanvasTextFunctions.draw( ctx, font,size,x-w,y,text);
     };
-    ctx.drawTextCenter = function(font,size,x,y,text) { 
+    ctx.drawTextCenter = function(font,size,x,y,text) {
 	var w = CanvasTextFunctions.measure(font,size,text);
-	return CanvasTextFunctions.draw( ctx, font,size,x-w/2,y,text); 
+	return CanvasTextFunctions.draw( ctx, font,size,x-w/2,y,text);
     };
 }
 
