@@ -159,17 +159,17 @@ TODO / IDEAs
 							typing(' ');
 							break;
 						case 'shift':
-							shift = !shift;
-							toggleshift(shift);
+							toggleshift(!shift);
 							break;
 						case 'caps':
-							shift = !shift;
-							toggleshift(shift);
+							toggleshift(!shift);
 							break;
 					}
 				});
 
 				/*
+				// TODO autofire
+
 				var swipe_type = false;
 				li.addEventListener('mousedown', function() {
 					swipe_type = true;
@@ -200,17 +200,13 @@ TODO / IDEAs
 
 			var shift = false;
 
-			// keys['left-shift'].dom.addEventListener('click', () => {
-			// 	shift = !shift;
-			// 	toggleshift(shift);
-			// });
-
 			const backspace = () => {
 				// console.log('backspace');
 				hud.innerHTML = hud.innerHTML.substring(0, hud.innerHTML.length - 1);
 			};
 
-			const toggleshift = (shift) => {
+			const toggleshift = (s) => {
+				shift = s;
 				// console.log('shift');
 				for (var r in keys) {
 					const target = keys[r];
@@ -241,7 +237,6 @@ TODO / IDEAs
 			animate();
 
 			function resize() {
-
 				window.addEventListener( 'resize', onWindowResize, false );
 
 				function onWindowResize() {
@@ -250,9 +245,7 @@ TODO / IDEAs
 					camera.updateProjectionMatrix();
 
 					renderer.setSize( window.innerWidth, window.innerHeight );
-
 				}
-
 			}
 
 			var presses = {};
@@ -280,6 +273,7 @@ TODO / IDEAs
 						e.preventDefault();
 						break;
 					case 16:
+						shift = true;
 						toggleshift(true);
 						e.preventDefault();
 						break;
@@ -299,6 +293,7 @@ TODO / IDEAs
 
 				switch (e.which) {
 					case 16:
+						shift = false;
 						toggleshift(false);
 						break;
 				}
