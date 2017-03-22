@@ -108,5 +108,11 @@ for (k in keys) {
     map[key.keycode].push(key);
 }
 
-// console.log('map', map);
-// console.log('keys', keys);
+var keyboard_keys = Object.keys(keys).map(k => Object.assign({ k }, keys[k]));
+
+/*
+    Exports
+    map,
+    keys,
+    keyboard_keys
+*/

@@ -39,7 +39,7 @@
 				ctx.quadraticCurveTo(x, y, x, y + radius);
 			}
 
-			Object.keys(keys).map(k => keys[k]).forEach(key => {
+			keyboard_keys.forEach(key => {
 				ctx.beginPath();
 				const { x, y, w, h, char } = key;
 				// ctx.rect(x, y, w, h); // straight rect
