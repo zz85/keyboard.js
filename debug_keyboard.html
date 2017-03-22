@@ -15,7 +15,6 @@
 		<script>
 			// console.log('map', map);
 			// console.log('keys', keys);
-
 			const canvas = document.createElement('canvas');
 			canvas.width = window.innerWidth;
 			canvas.height = window.innerHeight;
@@ -25,16 +24,30 @@
 			document.body.appendChild(canvas);
 
 			ctx.textAlign = 'center';
-			ctx.textBaseline = 'middle';	
+			ctx.textBaseline = 'middle';
+
+			function roundedRect(ctx, x, y, width, height, radius) {
+				ctx.beginPath();
+				ctx.moveTo(x, y + radius);
+				ctx.lineTo(x, y + height - radius);
+				ctx.quadraticCurveTo(x, y + height, x + radius, y + height);
+				ctx.lineTo(x + width - radius, y + height);
+				ctx.quadraticCurveTo(x + width, y + height, x + width, y + height - radius);
+				ctx.lineTo(x + width, y + radius);
+				ctx.quadraticCurveTo(x + width, y, x + width - radius, y);
+				ctx.lineTo(x + radius, y);
+				ctx.quadraticCurveTo(x, y, x, y + radius);
+			}
 
 			Object.keys(keys).map(k => keys[k]).forEach(key => {
 				ctx.beginPath();
 				const { x, y, w, h, char } = key;
-				ctx.rect(x, y, w, h);
+				// ctx.rect(x, y, w, h); // straight rect
+				roundedRect(ctx, x, y, w, h, 7); // rounded rect
 				ctx.stroke();
 
 				ctx.fillText(char, x + w / 2, y + h / 2);
-			})
+			});
 		</script>
 	</body>
 </html>
