@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<style>
+		body {
+			background: #fefefe;
+		}
+		</style>
+	</head>
+	<body>
+
+		<script src="keyboard.js"></script>
+
+		<script>
+			// console.log('map', map);
+			// console.log('keys', keys);
+
+			const canvas = document.createElement('canvas');
+			canvas.width = window.innerWidth;
+			canvas.height = window.innerHeight;
+
+			const ctx = canvas.getContext('2d');
+
+			document.body.appendChild(canvas);
+
+			ctx.textAlign = 'center';
+			ctx.textBaseline = 'middle';	
+
+			Object.keys(keys).map(k => keys[k]).forEach(key => {
+				ctx.beginPath();
+				const { x, y, w, h, char } = key;
+				ctx.rect(x, y, w, h);
+				ctx.stroke();
+
+				ctx.fillText(char, x + w / 2, y + h / 2);
+			})
+		</script>
+	</body>
+</html>
