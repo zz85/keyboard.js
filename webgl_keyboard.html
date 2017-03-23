@@ -42,6 +42,10 @@
 				color: 0x999999,
 			});
 
+			const lineMaterial = new THREE.LineBasicMaterial({
+				color: 0x9CCCDF, // 0x0000ff,
+			});
+
 			function roundedRect(ctx, x, y, width, height, radius) {
 				ctx.moveTo(x, y + radius);
 				ctx.lineTo(x, y + height - radius);
@@ -57,28 +61,49 @@
 			var maxWidth = 0, maxHeight = 0;
 			var opts = { amount: 4, bevelEnabled: true, bevelSegments: 2, steps: 2, bevelSize: 1, bevelThickness: 1 };
 
-			keyboard_keys.forEach(key => {
+			function makeMacKeyboard() {
+				keyboard_keys.forEach(key => {
+					var shape = new THREE.Shape();
+					const { x, y, w, h, char } = key;
+					roundedRect(shape, x, y, w, h, 7);
+
+					// var geometry = new THREE.ShapeBufferGeometry( shape );
+					var geometry = new THREE.ExtrudeGeometry( shape, opts );
+					var mesh = new THREE.Mesh( geometry, keyMaterial );
+					keyboard3d.add(mesh);
+
+					maxWidth = Math.max(maxWidth, w + x);
+					maxHeight = Math.max(maxHeight, h + y);
+				});
+
 				var shape = new THREE.Shape();
-				const { x, y, w, h, char } = key;
-				roundedRect(shape, x, y, w, h, 7);
+				var PADDING = 5;
+				roundedRect(shape, -PADDING, -PADDING, maxWidth + PADDING * 2, maxHeight + PADDING * 2, 7);
+				var geometry = new THREE.ExtrudeGeometry( shape, Object.assign({}, opts, {amount: 8}));
+				var base = new THREE.Mesh( geometry, grey_material );
+				base.position.z = 4;
 
-				// var geometry = new THREE.ShapeBufferGeometry( shape );
-				var geometry = new THREE.ExtrudeGeometry( shape, opts );
-				var mesh = new THREE.Mesh( geometry, keyMaterial );
-				keyboard3d.add(mesh);
+				keyboard3d.add(base);
+			}
 
-				maxWidth = Math.max(maxWidth, w + x);
-				maxHeight = Math.max(maxHeight, h + y);
-			});
+			function makeLineKeyboard() {
+				keyboard_keys.forEach(key => {
+					var shape = new THREE.Shape();
+					const { x, y, w, h, char } = key;
+					roundedRect(shape, x, y, w, h, 7);
 
-			var shape = new THREE.Shape();
-			var PADDING = 5;
-			roundedRect(shape, -PADDING, -PADDING, maxWidth + PADDING * 2, maxHeight + PADDING * 2, 7);
-			var geometry = new THREE.ExtrudeGeometry( shape, Object.assign({}, opts, {amount: 8}));
-			var base = new THREE.Mesh( geometry, grey_material );
-			base.position.z = 4;
+					var geometry = new THREE.Geometry();
+					geometry.vertices = shape.getPoints().map(p => new THREE.Vector3(p.x, p.y, 0));
+					var outline = new THREE.Line( geometry, lineMaterial );
+					keyboard3d.add(outline);
 
-			keyboard3d.add(base);
+					maxWidth = Math.max(maxWidth, w + x);
+					maxHeight = Math.max(maxHeight, h + y);
+				});
+			}
+
+			// makeMacKeyboard();
+			makeLineKeyboard()
 
 			keyboard3d.position.x = -maxWidth / 2;
 			keyboard3d.rotation.x = Math.PI / 2;
@@ -143,7 +168,6 @@
 
 
 			function animate() {
-
 				var now = Date.now();
 				var delta = now - last;
 				last = now;
