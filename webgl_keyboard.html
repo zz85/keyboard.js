@@ -61,14 +61,26 @@
 			var maxWidth = 0, maxHeight = 0;
 			var opts = { amount: 4, bevelEnabled: true, bevelSegments: 2, steps: 2, bevelSize: 1, bevelThickness: 1 };
 
+			var extrudeGeometryCache = {};
+			// TODO new THREE.ShapeBufferGeometry( shape );
+
+			// create and cache ExtrudeGeometry;
+			function getExtrudeGeometry(w, h) {
+				const key = `${w}.${h}`;
+				if (extrudeGeometryCache[key]) return extrudeGeometryCache[key];
+
+				const shape = new THREE.Shape();
+				roundedRect(shape, 0, 0, w, h, 7);
+				const geometry = new THREE.ExtrudeGeometry( shape, opts );
+				extrudeGeometryCache[key] = geometry;
+				return geometry;
+			}
+
 			function makeMacKeyboard() {
 				keyboard_keys.forEach(key => {
-					var shape = new THREE.Shape();
 					const { x, y, w, h, char } = key;
-					roundedRect(shape, 0, 0, w, h, 7);
 
-					// var geometry = new THREE.ShapeBufferGeometry( shape );
-					var geometry = new THREE.ExtrudeGeometry( shape, opts );
+					const geometry = getExtrudeGeometry(w, h);
 					var mesh = new THREE.Mesh( geometry, keyMaterial );
 					mesh.position.set(x, y, 0);
 					keyboard3d.add(mesh);
@@ -104,8 +116,8 @@
 				});
 			}
 
-			// makeMacKeyboard();
-			makeLineKeyboard()
+			makeMacKeyboard();
+			// makeLineKeyboard()
 
 			keyboard3d.position.x = -maxWidth / 2;
 			keyboard3d.rotation.x = Math.PI / 2;
