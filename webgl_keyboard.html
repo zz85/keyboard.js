@@ -4,7 +4,8 @@
 		<meta charset="utf-8">
 		<style>
 		body {
-
+			margin: 0;
+			overflow: hidden;
 		}
 
 		#container {
@@ -26,44 +27,61 @@
 		<script>
 			const keyboard3d = new THREE.Object3D();
 
-            // MeshBasicMaterial
-            const key_material = new THREE.MeshPhongMaterial({
-                color: 0xffffff,
-                // wireframe: true,
-                side: THREE.DoubleSide
-            });
+			//
+			const wireframeMaterial = new THREE.MeshBasicMaterial({
+				color: 0xffffff,
+				wireframe: true,
+				side: THREE.DoubleSide
+			});
 
-            function roundedRect(ctx, x, y, width, height, radius) {
-                ctx.moveTo(x, y + radius);
-                ctx.lineTo(x, y + height - radius);
-                ctx.quadraticCurveTo(x, y + height, x + radius, y + height);
-                ctx.lineTo(x + width - radius, y + height);
-                ctx.quadraticCurveTo(x + width, y + height, x + width, y + height - radius);
-                ctx.lineTo(x + width, y + radius);
-                ctx.quadraticCurveTo(x + width, y, x + width - radius, y);
-                ctx.lineTo(x + radius, y);
-                ctx.quadraticCurveTo(x, y, x, y + radius);
-            }
+			const keyMaterial = new THREE.MeshPhongMaterial({
+				color: 0x333333,
+			});
 
-            var maxWidth = 0;
-            keyboard_keys.forEach(key => {
-                var shape = new THREE.Shape();
-                const { x, y, w, h, char } = key;
-                roundedRect(shape, x, y, w, h, 7);
-                
-                // var geometry = new THREE.ShapeBufferGeometry( shape );
-                
-                var opts = { amount: 4, bevelEnabled: true, bevelSegments: 2, steps: 2, bevelSize: 1, bevelThickness: 1 };
-                var geometry = new THREE.ExtrudeGeometry( shape, opts );
-                var mesh = new THREE.Mesh( geometry, key_material );
-                keyboard3d.add(mesh);
+			const grey_material = new THREE.MeshPhongMaterial({
+				color: 0x999999,
+			});
 
-                maxWidth = Math.max(maxWidth, w + x);
-            });
+			function roundedRect(ctx, x, y, width, height, radius) {
+				ctx.moveTo(x, y + radius);
+				ctx.lineTo(x, y + height - radius);
+				ctx.quadraticCurveTo(x, y + height, x + radius, y + height);
+				ctx.lineTo(x + width - radius, y + height);
+				ctx.quadraticCurveTo(x + width, y + height, x + width, y + height - radius);
+				ctx.lineTo(x + width, y + radius);
+				ctx.quadraticCurveTo(x + width, y, x + width - radius, y);
+				ctx.lineTo(x + radius, y);
+				ctx.quadraticCurveTo(x, y, x, y + radius);
+			}
 
-            keyboard3d.position.x = -maxWidth / 2;
-            keyboard3d.rotation.x = Math.PI / 2;
+			var maxWidth = 0, maxHeight = 0;
+			var opts = { amount: 4, bevelEnabled: true, bevelSegments: 2, steps: 2, bevelSize: 1, bevelThickness: 1 };
 
+			keyboard_keys.forEach(key => {
+				var shape = new THREE.Shape();
+				const { x, y, w, h, char } = key;
+				roundedRect(shape, x, y, w, h, 7);
+
+				// var geometry = new THREE.ShapeBufferGeometry( shape );
+				var geometry = new THREE.ExtrudeGeometry( shape, opts );
+				var mesh = new THREE.Mesh( geometry, keyMaterial );
+				keyboard3d.add(mesh);
+
+				maxWidth = Math.max(maxWidth, w + x);
+				maxHeight = Math.max(maxHeight, h + y);
+			});
+
+			var shape = new THREE.Shape();
+			var PADDING = 5;
+			roundedRect(shape, -PADDING, -PADDING, maxWidth + PADDING * 2, maxHeight + PADDING * 2, 7);
+			var geometry = new THREE.ExtrudeGeometry( shape, Object.assign({}, opts, {amount: 8}));
+			var base = new THREE.Mesh( geometry, grey_material );
+			base.position.z = 4;
+
+			keyboard3d.add(base);
+
+			keyboard3d.position.x = -maxWidth / 2;
+			keyboard3d.rotation.x = Math.PI / 2;
 
 			'use strict';
 
@@ -93,19 +111,26 @@
 				camera = new THREE.PerspectiveCamera( 53, window.innerWidth / window.innerHeight, 1, 1000000 );
 				camera.position.set( 0, 300, 300 );
 
-                controls = new THREE.TrackballControls( camera );
-                scene = new THREE.Scene();
+				controls = new THREE.TrackballControls( camera );
+				scene = new THREE.Scene();
 
 				scene.add(keyboard3d);
 
-                var light = new THREE.PointLight(0xffffff);
-                light.position.y = 20;
-                scene.add(light);
+				var light = new THREE.PointLight(0xffffff);
+				light.position.set(0, 390, -80);
+				scene.add(light);
+
+				// var light2 = new THREE.PointLight(0xffffff);
+				// light2.position.set(0, -390, -80);
+				// scene.add(light2);
+
+				var ambience = new THREE.AmbientLight(0x666666);
+				scene.add(ambience);
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				
-                var container = document.getElementById('container');
+
+				var container = document.getElementById('container');
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
@@ -128,7 +153,7 @@
 				renderer.render( scene, camera );
 				stats.update();
 
-                requestAnimationFrame(animate);
+				requestAnimationFrame(animate);
 			}
 
 		</script>
