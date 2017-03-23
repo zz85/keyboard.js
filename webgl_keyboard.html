@@ -65,11 +65,12 @@
 				keyboard_keys.forEach(key => {
 					var shape = new THREE.Shape();
 					const { x, y, w, h, char } = key;
-					roundedRect(shape, x, y, w, h, 7);
+					roundedRect(shape, 0, 0, w, h, 7);
 
 					// var geometry = new THREE.ShapeBufferGeometry( shape );
 					var geometry = new THREE.ExtrudeGeometry( shape, opts );
 					var mesh = new THREE.Mesh( geometry, keyMaterial );
+					mesh.position.set(x, y, 0);
 					keyboard3d.add(mesh);
 
 					maxWidth = Math.max(maxWidth, w + x);
@@ -90,11 +91,12 @@
 				keyboard_keys.forEach(key => {
 					var shape = new THREE.Shape();
 					const { x, y, w, h, char } = key;
-					roundedRect(shape, x, y, w, h, 7);
+					roundedRect(shape, 0, 0, w, h, 7);
 
 					var geometry = new THREE.Geometry();
 					geometry.vertices = shape.getPoints().map(p => new THREE.Vector3(p.x, p.y, 0));
 					var outline = new THREE.Line( geometry, lineMaterial );
+					outline.position.set(x, y, 0);
 					keyboard3d.add(outline);
 
 					maxWidth = Math.max(maxWidth, w + x);
