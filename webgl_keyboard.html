@@ -174,7 +174,6 @@
 				});
 
 				const letter = new THREE.Mesh(plane(), letterShader);
-				letter.position.z = -5.1
 				letter.scale.x = mul;
 
 				return letter;
@@ -189,7 +188,13 @@
 					mesh.position.set(x + w / 2, y + h / 2, 0);
 					keyboard3d.add(mesh);
 
-					const letter = makeText(char);
+					let txt = char.length > 2 ? char.toLowerCase() : key.shift;
+					// if (char.length === 1 && !txt.match(/^[AZ]$/i)) {
+					// 	console.log(char, key.shift, txt.match(/^[AZ]$/i));
+					// 	txt = char + '\n' + key.shift;
+					// }
+					const letter = makeText(txt);
+					letter.position.z = -5.01;
 					mesh.add(letter);
 
 					maxWidth = Math.max(maxWidth, w + x);
