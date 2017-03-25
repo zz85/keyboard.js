@@ -59,7 +59,7 @@
 			}
 
 			var maxWidth = 0, maxHeight = 0;
-			var opts = { amount: 4, bevelEnabled: true, bevelSegments: 2, steps: 2, bevelSize: 1, bevelThickness: 1 };
+			var opts = { amount: 2, bevelEnabled: true, bevelSegments: 2, steps: 2, bevelSize: 1, bevelThickness: 1 };
 
 			class Cache {
 				constructor() {
@@ -104,8 +104,16 @@
 					const shape = new THREE.Shape();
 					roundedRect(shape, 0, 0, w, h, 7);
 					const geometry = new THREE.ExtrudeGeometry( shape, opts );
+					alignCenter(geometry);
 					return geometry;
 				});
+			}
+
+			function alignCenter(geometry) {
+				geometry.computeBoundingBox();
+				var max = geometry.boundingBox.max;
+				var m = (new THREE.Matrix4()).makeTranslation(-max.x / 2, -max.y / 2, -max.z / 2);
+				geometry.applyMatrix(m);
 			}
 
 			function getLineGeometry(w, h) {
@@ -116,11 +124,7 @@
 					roundedRect(shape, 0, 0, w, h, 7);
 					const geometry = new THREE.Geometry();
 					geometry.vertices = shape.getPoints().map(p => new THREE.Vector3(p.x, p.y, 0));
-
-					geometry.computeBoundingBox();
-					var max = geometry.boundingBox.max;
-					var m = (new THREE.Matrix4()).makeTranslation(-max.x / 2, -max.y / 2, -max.z / 2);
-					geometry.applyMatrix(m);
+					alignCenter(geometry);
 
 					return geometry;
 				});
@@ -128,9 +132,13 @@
 
 			function plane() {
 				return geometryCache.getOrMake('plane',
-					() => new THREE.PlaneBufferGeometry(20, 20, 1, 1)
+					() => new THREE.PlaneBufferGeometry(14, 14, 1, 1)
 				);
 			}
+
+			// function getText(char) {
+			// 	return geometryCache.getOrMake('text:' + char, () => makeText(char));
+			// }
 
 			function makeText(char) {
 				// 64 good quality, 16 minimal readable
@@ -140,35 +148,33 @@
 				const canvasSize = 64;
 				const canvas = document.createElement('canvas');
 				const ctx = canvas.getContext('2d');
-				ctx.font = canvasSize / 4 * 3 + 'px Monospace'
+				ctx.font = canvasSize / 4 * 3 + 'px helvetica'
 				const c = ctx.measureText(char);
 				const mul = (Math.ceil(c.width / canvasSize) | 0) ;
 				canvas.width = mul * canvasSize;
 				canvas.height = canvasSize;
-				console.log(canvas.width, canvas.height);
-				ctx.font = canvasSize / 4 * 3 + 'px Monospace'
+
+				ctx.font = canvasSize / 4 * 3 + 'px helvetica'
 				ctx.textAlign = 'center';
 				ctx.textBaseline = 'middle';
 				ctx.fillStyle = '#fff';
 				ctx.fillText(char, canvas.width / 2, canvas.height / 2);
-
-				document.body.append(canvas);
-
-				// char
+				// document.body.append(canvas); // debug
 
 				const texture = new THREE.Texture(canvas);
 				texture.flipY = false
 				texture.needsUpdate = true;
 
 				const letterShader = new THREE.MeshBasicMaterial({
-					color: 0x60B8DB,
+					color: 0xffffff, // 0x60B8DB
 					// wireframe: true,
 					side: THREE.DoubleSide,
-					map: texture
+					map: texture,
+					transparent: true
 				});
 
 				const letter = new THREE.Mesh(plane(), letterShader);
-				letter.position.y = 0.1;
+				letter.position.z = -5.1
 				letter.scale.x = mul;
 
 				return letter;
@@ -180,8 +186,11 @@
 
 					const geometry = getExtrudeGeometry(w, h);
 					var mesh = new THREE.Mesh( geometry, keyMaterial );
-					mesh.position.set(x, y, 0);
+					mesh.position.set(x + w / 2, y + h / 2, 0);
 					keyboard3d.add(mesh);
+
+					const letter = makeText(char);
+					mesh.add(letter);
 
 					maxWidth = Math.max(maxWidth, w + x);
 					maxHeight = Math.max(maxHeight, h + y);
@@ -214,8 +223,8 @@
 				});
 			}
 
-			// makeMacKeyboard();
-			makeLineKeyboard()
+			makeMacKeyboard();
+			// makeLineKeyboard()
 			setTimeout(info, 500);
 
 			keyboard3d.position.x = -maxWidth / 2;
