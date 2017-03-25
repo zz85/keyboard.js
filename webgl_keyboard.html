@@ -117,6 +117,12 @@
 					const geometry = new THREE.Geometry();
 					geometry.vertices = shape.getPoints().map(p => new THREE.Vector3(p.x, p.y, 0));
 
+
+					geometry.computeBoundingBox();
+					var max = geometry.boundingBox.max;
+					var m = (new THREE.Matrix4()).makeTranslation(-max.x / 2, -max.y / 2, -max.z / 2);
+					geometry.applyMatrix(m);
+
 					return geometry;
 				});
 			}
@@ -149,7 +155,12 @@
 					const { x, y, w, h, char } = key;
 					const geometry = getLineGeometry(w, h);
 					const outline = new THREE.Line( geometry, lineMaterial );
-					outline.position.set(x, y, 0);
+					outline.position.set(x + w / 2, y + h / 2, 0);
+
+					const plane = new THREE.PlaneGeometry(10, 10, 1, 1);
+					const letter = new THREE.Mesh(plane, wireframeMaterial);
+					outline.add(letter);
+
 					keyboard3d.add(outline);
 
 					maxWidth = Math.max(maxWidth, w + x);
