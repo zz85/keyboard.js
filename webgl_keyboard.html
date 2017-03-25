@@ -61,19 +61,64 @@
 			var maxWidth = 0, maxHeight = 0;
 			var opts = { amount: 4, bevelEnabled: true, bevelSegments: 2, steps: 2, bevelSize: 1, bevelThickness: 1 };
 
-			var extrudeGeometryCache = {};
-			// TODO new THREE.ShapeBufferGeometry( shape );
+			class Cache {
+				constructor() {
+					this.cache = {};
+				}
+
+				get(key) {
+					return this.cache[key];
+				}
+
+				set(key, item) {
+					this.cache[key] = item;
+				}
+
+				getOrMake(key, func) {
+					if (key in this.cache) {
+						return this.get(key);
+					}
+
+					const item = func();
+					this.set(key, item);
+					return item;
+				}
+			}
+
+			var geometryCache = new Cache();
+
+			var info = () => console.log('info', '\n',
+				'geometries\t', renderer.info.memory.geometries, '\n',
+				'textures\t', renderer.info.memory.textures, '\n',
+				'vertices\t', renderer.info.render.vertices, '\n',
+				'calls\t', renderer.info.render.calls, '\n',
+				'faces\t', renderer.info.render.faces, '\n',
+				'points\t', renderer.info.render.points, '\n'
+			);
 
 			// create and cache ExtrudeGeometry;
 			function getExtrudeGeometry(w, h) {
-				const key = `${w}.${h}`;
-				if (extrudeGeometryCache[key]) return extrudeGeometryCache[key];
+				const key = `e${w}.${h}`;
 
-				const shape = new THREE.Shape();
-				roundedRect(shape, 0, 0, w, h, 7);
-				const geometry = new THREE.ExtrudeGeometry( shape, opts );
-				extrudeGeometryCache[key] = geometry;
-				return geometry;
+				return geometryCache.getOrMake(key, () => {
+					const shape = new THREE.Shape();
+					roundedRect(shape, 0, 0, w, h, 7);
+					const geometry = new THREE.ExtrudeGeometry( shape, opts );
+					return geometry;
+				});
+			}
+
+			function getLineGeometry(w, h) {
+				const key = `l${w}.${h}`;
+
+				return geometryCache.getOrMake(key, () => {
+					const shape = new THREE.Shape();
+					roundedRect(shape, 0, 0, w, h, 7);
+					const geometry = new THREE.Geometry();
+					geometry.vertices = shape.getPoints().map(p => new THREE.Vector3(p.x, p.y, 0));
+
+					return geometry;
+				});
 			}
 
 			function makeMacKeyboard() {
@@ -101,13 +146,9 @@
 
 			function makeLineKeyboard() {
 				keyboard_keys.forEach(key => {
-					var shape = new THREE.Shape();
 					const { x, y, w, h, char } = key;
-					roundedRect(shape, 0, 0, w, h, 7);
-
-					var geometry = new THREE.Geometry();
-					geometry.vertices = shape.getPoints().map(p => new THREE.Vector3(p.x, p.y, 0));
-					var outline = new THREE.Line( geometry, lineMaterial );
+					const geometry = getLineGeometry(w, h);
+					const outline = new THREE.Line( geometry, lineMaterial );
 					outline.position.set(x, y, 0);
 					keyboard3d.add(outline);
 
@@ -116,8 +157,9 @@
 				});
 			}
 
-			makeMacKeyboard();
-			// makeLineKeyboard()
+			// makeMacKeyboard();
+			makeLineKeyboard()
+			setTimeout(info, 500);
 
 			keyboard3d.position.x = -maxWidth / 2;
 			keyboard3d.rotation.x = Math.PI / 2;
