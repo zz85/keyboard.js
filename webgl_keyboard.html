@@ -132,6 +132,48 @@
 				);
 			}
 
+			function makeText(char) {
+				// 64 good quality, 16 minimal readable
+				// zoom in high quality 128, 256 (60fps), 512 (40fps), 1024 (20fps)
+				// 1024 texture - 16 * 16 = 256 of 64x64
+				// 128 * 64 = 8192
+				const canvasSize = 64;
+				const canvas = document.createElement('canvas');
+				const ctx = canvas.getContext('2d');
+				ctx.font = canvasSize / 4 * 3 + 'px Monospace'
+				const c = ctx.measureText(char);
+				const mul = (Math.ceil(c.width / canvasSize) | 0) ;
+				canvas.width = mul * canvasSize;
+				canvas.height = canvasSize;
+				console.log(canvas.width, canvas.height);
+				ctx.font = canvasSize / 4 * 3 + 'px Monospace'
+				ctx.textAlign = 'center';
+				ctx.textBaseline = 'middle';
+				ctx.fillStyle = '#fff';
+				ctx.fillText(char, canvas.width / 2, canvas.height / 2);
+
+				document.body.append(canvas);
+
+				// char
+
+				const texture = new THREE.Texture(canvas);
+				texture.flipY = false
+				texture.needsUpdate = true;
+
+				const letterShader = new THREE.MeshBasicMaterial({
+					color: 0x60B8DB,
+					// wireframe: true,
+					side: THREE.DoubleSide,
+					map: texture
+				});
+
+				const letter = new THREE.Mesh(plane(), letterShader);
+				letter.position.y = 0.1;
+				letter.scale.x = mul;
+
+				return letter;
+			}
+
 			function makeMacKeyboard() {
 				keyboard_keys.forEach(key => {
 					const { x, y, w, h, char } = key;
@@ -162,38 +204,7 @@
 					const outline = new THREE.Line( geometry, lineMaterial );
 					outline.position.set(x + w / 2, y + h / 2, 0);
 
-					// 64 good quality, 16 minimal readable
-					// zoom in high quality 128, 256 (60fps), 512 (40fps), 1024 (20fps)
-					// 1024 texture - 16 * 16 = 256 of 64x64
-					// 128 * 64 = 8192
-					const canvasSize = 64;
-					const canvas = document.createElement('canvas');
-					canvas.width = canvasSize;
-					canvas.height = canvasSize;
-					const ctx = canvas.getContext('2d');
-					ctx.font = canvasSize / 4 * 3 + 'px Monospace'
-					ctx.textAlign = 'center';
-					ctx.textBaseline = 'middle';
-					ctx.fillStyle = '#fff';
-					ctx.fillText(char, canvas.width / 2, canvas.height / 2);
-
-					document.body.append(canvas);
-
-					// char
-
-					const texture = new THREE.Texture(canvas);
-					texture.flipY = false
-					texture.needsUpdate = true;
-
-					const letterShader = new THREE.MeshBasicMaterial({
-						color: 0x60B8DB,
-						// wireframe: true,
-						side: THREE.DoubleSide,
-						map: texture
-					});
-
-					const letter = new THREE.Mesh(plane(), letterShader);
-					letter.position.y = 0.1;
+					const letter = makeText(char);
 					outline.add(letter);
 
 					keyboard3d.add(outline);
