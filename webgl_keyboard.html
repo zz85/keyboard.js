@@ -126,6 +126,12 @@
 				});
 			}
 
+			function plane() {
+				return geometryCache.getOrMake('plane',
+					() => new THREE.PlaneBufferGeometry(20, 20, 1, 1)
+				);
+			}
+
 			function makeMacKeyboard() {
 				keyboard_keys.forEach(key => {
 					const { x, y, w, h, char } = key;
@@ -155,8 +161,6 @@
 					const geometry = getLineGeometry(w, h);
 					const outline = new THREE.Line( geometry, lineMaterial );
 					outline.position.set(x + w / 2, y + h / 2, 0);
-
-					const plane = new THREE.PlaneBufferGeometry(20, 20, 1, 1);
 
 					// 64 good quality, 16 minimal readable
 					// zoom in high quality 128, 256 (60fps), 512 (40fps), 1024 (20fps)
@@ -188,7 +192,7 @@
 						map: texture
 					});
 
-					const letter = new THREE.Mesh(plane, letterShader);
+					const letter = new THREE.Mesh(plane(), letterShader);
 					letter.position.y = 0.1;
 					outline.add(letter);
 
