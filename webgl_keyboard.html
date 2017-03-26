@@ -130,9 +130,11 @@
 				});
 			}
 
+			const PLANE_WIDTH = 14;
+
 			function plane() {
 				return geometryCache.getOrMake('plane',
-					() => new THREE.PlaneBufferGeometry(14, 14, 1, 1)
+					() => new THREE.PlaneBufferGeometry(PLANE_WIDTH, PLANE_WIDTH, 1, 1)
 				);
 			}
 
@@ -182,23 +184,36 @@
 			function makeMacKeyboard() {
 				keyboard_keys.forEach(key => {
 					const { x, y, w, h, char } = key;
+					console.log(key);
 
 					const geometry = getExtrudeGeometry(w, h);
 					var mesh = new THREE.Mesh( geometry, keyMaterial );
 					mesh.position.set(x + w / 2, y + h / 2, 0);
 					keyboard3d.add(mesh);
 
-					let txt = char.length > 2 ? char.toLowerCase() : key.shift;
-					// if (char.length === 1 && !txt.match(/^[AZ]$/i)) {
-					// 	console.log(char, key.shift, txt.match(/^[AZ]$/i));
-					// 	txt = char + '\n' + key.shift;
-					// }
-					const letter = makeText(txt);
-					letter.position.z = -5.01;
-					mesh.add(letter);
-
 					maxWidth = Math.max(maxWidth, w + x);
 					maxHeight = Math.max(maxHeight, h + y);
+
+					let txt = char.length > 2 ? char.toLowerCase() : key.shift;
+					if (txt === 'cmd') txt = '⌘';
+					if (txt === 'space') txt = '';
+
+					let chars;
+
+					if (char.length === 1 && !char.match(/^[A-Za-z]$/i)) {
+						chars = [key.shift, char];
+					} else {
+						chars = [txt];
+					}
+
+					chars.forEach((char, i) => {
+						const letter = makeText(char);
+						letter.position.z = -5.01;
+						const units = 1 / chars.length;
+
+						letter.position.y = ((i + 0.5) * units - 0.5) * 30;
+						mesh.add(letter);
+					});
 				});
 
 				var shape = new THREE.Shape();
