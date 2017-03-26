@@ -11,9 +11,22 @@
 		#container {
 
 		}
-
-
 		</style>
+
+		<!--
+			26 April 2017
+
+			Three.js + WebGL implmentation of Keyboard
+
+			DONE
+			- keyboard in "tron" flavour
+			- keyboard in "macbook air" flavour
+
+			TODO
+			- Screen picking
+			- DOM keypresses
+			- SDF generation
+		-->
 	</head>
 	<body>
 		<div id="container"></div>
@@ -184,7 +197,6 @@
 			function makeMacKeyboard() {
 				keyboard_keys.forEach(key => {
 					const { x, y, w, h, char } = key;
-					console.log(key);
 
 					const geometry = getExtrudeGeometry(w, h);
 					var mesh = new THREE.Mesh( geometry, keyMaterial );
@@ -195,16 +207,21 @@
 					maxHeight = Math.max(maxHeight, h + y);
 
 					let txt = char.length > 2 ? char.toLowerCase() : key.shift;
-					if (txt === 'cmd') txt = '⌘';
-					if (txt === 'space') txt = '';
 
-					let chars;
+					const mac_labels = {
+						'space': '',
+						// 'cmd': '⌘\ncommand',
+						// 'alt': 'alt\noption', //⌥
+						// 'ctrl': 'control'
+					};
+
+					if (txt in mac_labels) txt = mac_labels[txt];
 
 					if (char.length === 1 && !char.match(/^[A-Za-z]$/i)) {
-						chars = [key.shift, char];
-					} else {
-						chars = [txt];
+						txt = key.shift + '\n' + char;
 					}
+
+					const chars = txt.split('\n');
 
 					chars.forEach((char, i) => {
 						const letter = makeText(char);
