@@ -194,6 +194,8 @@
 				return letter;
 			}
 
+			var kb_meshes = {};
+
 			function makeMacKeyboard() {
 				keyboard_keys.forEach(key => {
 					const { x, y, w, h, char } = key;
@@ -202,6 +204,8 @@
 					var mesh = new THREE.Mesh( geometry, keyMaterial );
 					mesh.position.set(x + w / 2, y + h / 2, 0);
 					keyboard3d.add(mesh);
+					kb_meshes[key.keycode] = mesh;
+					console.log('k', key);
 
 					maxWidth = Math.max(maxWidth, w + x);
 					maxHeight = Math.max(maxHeight, h + y);
@@ -210,6 +214,7 @@
 
 					const mac_labels = {
 						'space': '',
+						// unicode see http://tech.karbassi.com/2009/05/27/command-option-shift-symbols-in-unicode/
 						// 'cmd': '⌘\ncommand',
 						// 'alt': 'alt\noption', //⌥
 						// 'ctrl': 'control'
@@ -261,7 +266,7 @@
 			}
 
 			makeMacKeyboard();
-			// makeLineKeyboard()
+			// makeLineKeyboard();
 			setTimeout(info, 500);
 
 			keyboard3d.position.x = -maxWidth / 2;
@@ -323,6 +328,42 @@
 				document.body.appendChild( stats.domElement );
 
 				resize();
+
+
+				var track_keys = {
+					track: {
+
+					},
+					fire_down: (code) => {
+						track_keys.track[code] = true;
+
+						var mesh = kb_meshes[code];
+						console.log(code, mesh)
+						if (mesh) {
+							console.log(mesh);
+							mesh.position.z += 3;
+						}
+					},
+					fire_up: (code) => {
+						track_keys.track[code] = false;
+
+						var mesh = kb_meshes[code];
+						mesh.position.z -= 3;
+
+					}
+				}
+
+				document.addEventListener('keydown', (e) => {
+					console.log('down', e)
+					if (!track_keys.track[e.keyCode]) {
+						track_keys.fire_down(e.keyCode);
+					}
+				})
+
+				document.addEventListener('keyup', (e) => {
+					console.log('up', e)
+					track_keys.fire_up(e.keyCode)
+				})
 			}
 
 
