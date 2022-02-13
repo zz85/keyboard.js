@@ -22,9 +22,10 @@
 			- keyboard in "tron" flavour
 			- keyboard in "macbook air" flavour
 
+			13 Feb - DOM keypresses
+
 			TODO
 			- Screen picking
-			- DOM keypresses
 			- SDF generation
 		-->
 	</head>
@@ -38,6 +39,7 @@
 		<script src="keyboard.js"></script>
 
 		<script>
+			const theme = location.hash === '#white' ? 'white' : 'black';
 			const keyboard3d = new THREE.Object3D();
 
 			//
@@ -48,7 +50,7 @@
 			});
 
 			const keyMaterial = new THREE.MeshPhongMaterial({
-				color: 0x333333,
+				color: theme == 'black' ? 0x333333 : 0xbbbbbb,
 			});
 
 			const grey_material = new THREE.MeshPhongMaterial({
@@ -172,7 +174,8 @@
 				ctx.font = canvasSize / 4 * 3 + 'px helvetica'
 				ctx.textAlign = 'center';
 				ctx.textBaseline = 'middle';
-				ctx.fillStyle = '#fff';
+				ctx.fillStyle = theme ===  'black' ? '#fff' : '#333';
+
 				ctx.fillText(char, canvas.width / 2, canvas.height / 2);
 				// document.body.append(canvas); // debug
 
@@ -198,6 +201,7 @@
 
 			function makeMacKeyboard() {
 				keyboard_keys.forEach(key => {
+					console.log('key', key);
 					const { x, y, w, h, char } = key;
 
 					const geometry = getExtrudeGeometry(w, h);
@@ -213,7 +217,7 @@
 					let txt = char.length > 2 ? char.toLowerCase() : key.shift;
 
 					const mac_labels = {
-						'space': '',
+						'space': ' ',
 						// unicode see http://tech.karbassi.com/2009/05/27/command-option-shift-symbols-in-unicode/
 						// 'cmd': '⌘\ncommand',
 						// 'alt': 'alt\noption', //⌥
@@ -341,14 +345,14 @@
 						console.log(code, mesh)
 						if (mesh) {
 							console.log(mesh);
-							mesh.position.z += 3;
+							mesh.position.z += 5;
 						}
 					},
 					fire_up: (code) => {
 						track_keys.track[code] = false;
 
 						var mesh = kb_meshes[code];
-						mesh.position.z -= 3;
+						mesh.position.z -= 5;
 
 					}
 				}
