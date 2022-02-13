@@ -18,6 +18,74 @@ var keyboard = [
     [ 'left-ctrl', 'left-alt', 'left-cmd', 'space', 'cmd', 'right-alt', 'right-ctrl']
 ];
 
+var codeMap = {
+    "0": "Digit0",
+    "1": "Digit1",
+    "2": "Digit2",
+    "3": "Digit3",
+    "4": "Digit4",
+    "5": "Digit5",
+    "6": "Digit6",
+    "7": "Digit7",
+    "8": "Digit8",
+    "9": "Digit9",
+    "`": "Backquote",
+    "-": "Minus",
+    "=": "Equal",
+    "delete": "Backspace",
+    "tab": "Tab",
+    "q": "KeyQ",
+    "w": "KeyW",
+    "e": "KeyE",
+    "r": "KeyR",
+    "t": "KeyT",
+    "y": "KeyY",
+    "u": "KeyU",
+    "i": "KeyI",
+    "o": "KeyO",
+    "p": "KeyP",
+    "[": "BracketLeft",
+    "]": "BracketRight",
+    "\\": "Backslash",
+    "esc": "Escape",
+    "a": "KeyA",
+    "s": "KeyS",
+    "d": "KeyD",
+    "f": "KeyF",
+    "g": "KeyG",
+    "h": "KeyH",
+    "j": "KeyJ",
+    "k": "KeyK",
+    "l": "KeyL",
+    ";": "Semicolon",
+    "'": "Quote",
+    "return": "Enter",
+
+    "z": "KeyZ",
+    "x": "KeyX",
+    "c": "KeyC",
+    "v": "KeyV",
+    "b": "KeyB",
+    "n": "KeyN",
+    "m": "KeyM",
+    ",": "Comma",
+    ".": "Period",
+    "/": "Slash",
+
+    "left-ctrl": "ControlLeft",
+    "left-alt": "AltLeft",
+    "left-cmd": "MetaLeft",
+    "left-shift": "ShiftLeft",
+
+    "right-ctrl": "ControlRight",
+    "right-alt": "AltRight",
+    "right-shift": "ShiftRight",
+    "cmd": "MetaRight",
+
+    "space": "Space",
+};
+
+
 var shiftkeyboard = [
     ['esc', 'F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12'],
     [ '~','!','@','#','$','%','^','&','*','(',')','_','+','DELETE'],
@@ -108,7 +176,7 @@ for (k in keys) {
     map[key.keycode].push(key);
 }
 
-var keyboard_keys = Object.keys(keys).map(k => Object.assign({ k }, keys[k]));
+var keyboard_keys = Object.keys(keys).map(k => Object.assign({ k, code: codeMap[k] }, keys[k]));
 
 /*
     Exports
