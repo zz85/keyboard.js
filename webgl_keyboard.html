@@ -22,10 +22,11 @@
 			- keyboard in "tron" flavour
 			- keyboard in "macbook air" flavour
 
-			13 Feb - DOM keypresses
+			13 Feb
+			- DOM keypresses
+			- Screen picking
 
 			TODO
-			- Screen picking
 			- SDF generation
 		-->
 	</head>
@@ -198,16 +199,19 @@
 			}
 
 			var kb_meshes = {};
+			var kb_meshes_array = [];
 
 			function makeMacKeyboard() {
 				keyboard_keys.forEach(key => {
-					const { x, y, w, h, char } = key;
+					const { x, y, w, h, char, code } = key;
 
 					const geometry = getExtrudeGeometry(w, h);
 					var mesh = new THREE.Mesh( geometry, keyMaterial );
 					mesh.position.set(x + w / 2, y + h / 2, 0);
 					keyboard3d.add(mesh);
-					kb_meshes[key.code] = mesh;
+					kb_meshes[code] = mesh;
+					mesh.code = code;
+					kb_meshes_array.push(mesh);
 
 					maxWidth = Math.max(maxWidth, w + x);
 					maxHeight = Math.max(maxHeight, h + y);
@@ -246,7 +250,6 @@
 				var geometry = new THREE.ExtrudeGeometry( shape, Object.assign({}, opts, {amount: 8}));
 				var base = new THREE.Mesh( geometry, grey_material );
 				base.position.z = 4;
-
 				keyboard3d.add(base);
 			}
 
@@ -280,6 +283,7 @@
 			var geometry, material, mesh;
 			var controls;
 			var stats;
+			var pointer = new THREE.Vector2(), raycaster;
 
 			var last = Date.now();
 
@@ -318,6 +322,7 @@
 				var ambience = new THREE.AmbientLight(0x666666);
 				scene.add(ambience);
 
+				raycaster = new THREE.Raycaster();
 				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
@@ -330,12 +335,53 @@
 				document.body.appendChild( stats.domElement );
 
 				resize();
+				renderer.domElement.addEventListener('mousemove', (e) => {
+					pointer.set(e.clientX / innerWidth * 2 - 1,  1 - 2 * e.clientY / innerHeight);
+				})
+
+				var mousedowns = new Set();
+
+				renderer.domElement.addEventListener('mousedown', pick)
+				renderer.domElement.addEventListener('touchstart', touche => {
+					var touches = touche.changedTouches;
+
+					for (var i = 0; i < touches.length; i++) {
+						var e = touches[i];
+						pointer.set(e.clientX / innerWidth * 2 - 1,  1 - 2 * e.clientY / innerHeight);
+						pick();
+					}
+
+				})
+				renderer.domElement.addEventListener('mouseup', unpick)
+				renderer.domElement.addEventListener('touchend', unpick)
+
+				function pick() {
+					raycaster.setFromCamera(pointer, camera);
+
+					const intersects = raycaster.intersectObjects(kb_meshes_array, false);
+					const found = intersects[0];
+					if (found && found.object.code) {
+						var code = found.object.code;
+						mousedowns.add(code)
+						track_keys.fire_down(code);
+					}
+				}
+
+				function unpick() {
+					for (let code of mousedowns) {
+						track_keys.fire_up(code);
+					}
+					mousedowns.clear();
+				}
+
+
 
 				var track_keys = {
 					track: {
 
 					},
-					fire_down: (code, name) => {
+					fire_down: (code) => {
+						if (track_keys.track[code]) return;
 						track_keys.track[code] = true;
 
 						var mesh = kb_meshes[code];
@@ -354,9 +400,7 @@
 				}
 
 				document.addEventListener('keydown', (e) => {
-					if (!track_keys.track[e.code]) {
-						track_keys.fire_down(e.code);
-					}
+					track_keys.fire_down(e.code);
 				})
 
 				document.addEventListener('keyup', (e) => {
